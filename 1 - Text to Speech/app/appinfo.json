@@ -1,0 +1,11 @@
+{
+	"title": "Text to Speech Test",
+	"type": "web",
+	"main": "index.html",
+    "icon": "pdk_logo_64x64.png",
+	"id": "com.joshondesign.webos.ttstest",
+	"version": "1.0.0",
+	"vendor": "Josh On Design",
+	"uiRevision": 2,
+	"plug-ins": true
+}

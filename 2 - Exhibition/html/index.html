@@ -1,0 +1,141 @@
+<html><head><title>Amino Canvas Export</title>
+<!-- <script src='http://goamino.org/download/daily/amino-1.0b2.js'></script> -->
+<!--<script src='../../../amino2/dist/amino.js'></script>
+-->
+<script src="../../enyo/0.10/framework/enyo.js" type="text/javascript"></script>
+<script src='amino.js'></script>
+<script src='generated.js'></script>
+<style type='text/css'>
+body { background-color: #000000; }
+</style>
+</head>
+<body onload="setupDrawing();">
+<canvas width="1024" height="748" id="foo"></canvas>
+<script>
+
+
+function setupDrawing(){
+var runner =  new Runner();
+runner.setCanvas(document.getElementById('foo'));
+runner.setFPS(30);
+runner.paintStrategy = new SimplePaintStrategy();
+runner.setBackground("#000000");
+runner.DEBUG = false;
+var snow = new Group();
+var MAX_WIDTH = 1024;
+var MAX_HEIGHT = 800;
+var MAX_PARTICLES = 100;
+var count = 0;
+var PARTICLE_INCREMENT = 10;
+
+var snowball = new Image();
+var snowball_loaded = false;
+snowball.onload = function() { snowball_loaded = true; }
+snowball.src = "snowball.png";
+
+
+function DynamicBitmapText() {
+    Node.call(this);
+    var self = this;
+    this.img = new Image();
+    this.img.src = "letters2.png";
+    this.text = "";
+    this.hasChildren = function() { return false; }
+    //@property x  The Y coordinate of the upper left corner of the image.
+    this.x = 0.0;
+    this.setX = function(x) { this.x = x;   this.setDirty();  return this;  };
+    this.getX = function() { return this.x; };
+    
+    //@property y  The Y coordinate of the upper left corner of the image.
+    this.y = 0.0;
+    this.setY = function(y) {  this.y = y;  this.setDirty();  return this;  };
+    this.getY = function() { return this.y; };
+    
+    this.draw = function(ctx) {
+        var ih = self.img.height;
+        //var sword = "6789.";
+        var sword = self.text;
+        var offsets = [ 10, 110, 180, 273, 351, 490, 565,  665, 768, 863, 970];
+        var widths =  [100,  70, 100,  82, 102,  85, 103,  100, 100, 100,  35];
+        
+        var y = self.y;
+        var x = self.x;
+        for(var i=0; i<sword.length; i++) {
+            var ind = sword.charCodeAt(i);
+            //special case for the period
+            if(ind == 46) ind = 48+10;
+            ind = ind-48;
+            //lop off the ascii value 48 (the code for '0')
+            var off = offsets[ind];
+            var iw = widths[ind];
+            
+            ctx.drawImage(self.img,
+                off, 0, iw, ih, //src
+                  x, y, iw, ih  //dst
+                );
+            //ctx.strokeRect(x,y,iw,ih);
+            x += iw;
+        }
+    };    
+    
+    this.setText = function(text) {
+        self.text = text;
+        return self;
+    };
+}
+
+
+
+runner.addCallback(function() {
+    if(snowball_loaded) {
+        if(snow.children.length < MAX_PARTICLES && count % 50 == 0) {
+            for(var j=0;j<PARTICLE_INCREMENT;j++) {
+                //var r = new Circle().setFill("white").setStrokeWidth(0);
+                var r = new ImageView(snowball);
+                r.setX(Math.random()*MAX_WIDTH);
+                r.setY(-30);
+                r.vx = (0.5-Math.random())/1.0;
+                r.vy = (0.5+Math.random())/1.0;
+                snow.add(r);
+            }
+        }
+    }
+//    ADB.debugLine("particle count = " + g.children.length);
+    count++;
+    for(var i=0;i<snow.children.length;i++) {
+        var r = snow.children[i];
+        r.x += r.vx;
+        r.y += r.vy;
+        if(r.x > MAX_WIDTH) r.x = 0;
+        if(r.x < 0) r.x = MAX_WIDTH;
+        if(r.y > MAX_HEIGHT) r.y = 0;
+    }
+    snow.setDirty();
+});
+
+
+var text = new DynamicBitmapText().setX(142).setY(310);
+
+runner.addCallback(function() {
+    var today = new Date();
+    var xmas = new Date("December 25, 2011");
+    var diff = xmas.getTime() - today.getTime();
+    var days = diff / (1000 * 60 * 60 * 24);
+
+    //daysleft.getChild().setText('' + days.toFixed(5));
+    daysleft.getChild().setText("");
+    text.setText(''+days.toFixed(5));
+});
+
+runner.setRoot(new Group()
+    .add(sceneRoot)
+    .add(text)
+    .add(snow));
+
+runner.start();
+
+
+}
+</script>
+</body>
+</html>

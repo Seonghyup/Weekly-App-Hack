@@ -1,0 +1,11 @@
+{
+	"title":"Christmas Countdown",
+	"type":"web",
+	"main":"index.html",
+	"id":"com.joshondesign.webos.christmascountdown",
+	"version":"1.0.2",
+	"vendor":"Josh On Design",
+	"uiRevision":2,
+	"icon": "icon.64.png",	
+	"dockMode": true	
+}
