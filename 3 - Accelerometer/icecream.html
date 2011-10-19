@@ -1,0 +1,297 @@
+<html>
+<head>
+<script src="Box2d.min.js"></script>
+<style type="text/css">
+body { background-color: white; border: 0; padding: 0; margin: 0;}
+canvas { background-color: none; position: absolute; left: 0; top: 0;}
+</style>
+</head>
+<body>
+<img src="cache_background.png"/>
+<canvas id="c" width="1024" height="748"></canvas>
+<script>
+
+var icecreamImage1 = new Image();
+icecreamImage1.src = "scoop.png";
+var background = new Image();
+//background.src = "cache_background.png";
+var bowl = new Image();
+bowl.src = "cache_bowl.png";
+
+
+//palm setup
+if (window.PalmSystem) {
+    window.PalmSystem.setWindowOrientation("right");
+    window.PalmSystem.stageReady();
+}
+
+
+// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+window.requestAnimFrame = (function(){
+      return  window.requestAnimationFrame       || 
+              window.webkitRequestAnimationFrame || 
+              window.mozRequestAnimationFrame    || 
+              window.oRequestAnimationFrame      || 
+              window.msRequestAnimationFrame     || 
+              function(/* function */ callback, /* DOMElement */ element){
+                window.setTimeout(callback, 1000 / 20);
+              };
+})();
+    
+var canvas = document.getElementById("c");
+var ctx = canvas.getContext("2d");
+
+var world;
+var pitch = 0;
+var position = 0;
+var roll = 0;
+var accelX = 0;
+var accelY = 1;
+var accelZ = 0;
+var circleBody;
+var SCALE=30;
+
+function init() {
+        
+
+var
+  b2Vec2 = Box2D.Common.Math.b2Vec2
+, b2BodyDef = Box2D.Dynamics.b2BodyDef
+, b2Body = Box2D.Dynamics.b2Body
+, b2FixtureDef = Box2D.Dynamics.b2FixtureDef
+, b2Fixture = Box2D.Dynamics.b2Fixture
+, b2World = Box2D.Dynamics.b2World
+, b2MassData = Box2D.Collision.Shapes.b2MassData
+, b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
+, b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
+, b2DebugDraw = Box2D.Dynamics.b2DebugDraw
+  ;
+
+//setup the world    
+world = new b2World(
+    new b2Vec2(0,10) //gravity
+    ,true            //allow sleep
+    );
+
+
+
+//standard fixdef
+var fixDef = new b2FixtureDef;
+fixDef.density = 1.0;
+fixDef.friction = 0.5;
+fixDef.restitution = 0.2;
+//create the ground object
+var bodyDef = new b2BodyDef;
+bodyDef.type = b2Body.b2_staticBody;
+bodyDef.position.x = canvas.width / 2 / SCALE;
+bodyDef.position.y = (canvas.height-20) / SCALE;
+fixDef.shape = new b2PolygonShape;
+//bottom
+fixDef.shape.SetAsBox((canvas.width/SCALE)/2, (20/SCALE)/2);
+world.CreateBody(bodyDef).CreateFixture(fixDef);
+//top
+fixDef.shape.SetAsBox((canvas.width/SCALE)/2, (20/SCALE)/2);
+bodyDef.position.y = 0;
+world.CreateBody(bodyDef).CreateFixture(fixDef);
+//left
+bodyDef.position.x = 0;
+bodyDef.position.y = (canvas.height/2)/SCALE;
+fixDef.shape.SetAsBox((20/SCALE)/2,(canvas.height/SCALE)/2);
+world.CreateBody(bodyDef).CreateFixture(fixDef);
+//right
+bodyDef.position.x = canvas.width/SCALE;
+bodyDef.position.y = (canvas.height/2)/SCALE;
+fixDef.shape.SetAsBox((20/SCALE)/2,(canvas.height/SCALE)/2);
+world.CreateBody(bodyDef).CreateFixture(fixDef);
+
+
+//left edge
+//bodyDef.type = b2Body.b2_staticBody;
+/*
+bodyDef.type = b2Body.b2_staticBody;
+fixDef.density = 1.0;
+fixDef.friction = 0.5;
+fixDef.restitution = 0.2;
+bodyDef.position.x = 0;//canvas.width / 2 / SCALE;
+bodyDef.position.y = (canvas.height-200)/SCALE;
+fixDef.shape = new b2PolygonShape;
+var points = [
+    new b2Vec2(250/SCALE,190/SCALE),
+    new b2Vec2(0/SCALE,190/SCALE),
+    new b2Vec2(0/SCALE,20/SCALE),
+];
+fixDef.shape.SetAsArray(points,3);
+world.CreateBody(bodyDef).CreateFixture(fixDef);
+*/
+
+/*
+//right edge
+bodyDef.position.x = (canvas.width-250) / SCALE;
+bodyDef.position.y = (canvas.height-200)/SCALE;
+fixDef.shape = new b2PolygonShape;
+var points = [
+    new b2Vec2(250/SCALE,0/SCALE),
+    new b2Vec2(250/SCALE,190/SCALE),
+    new b2Vec2(0/SCALE,190/SCALE),
+];
+fixDef.shape.SetAsArray(points,3);
+world.CreateBody(bodyDef).CreateFixture(fixDef);
+*/
+//the bowl parts
+bodyDef.position.x = (canvas.width/2-250) / SCALE;
+bodyDef.position.y = (canvas.height-300)/SCALE;
+fixDef.shape = new b2PolygonShape;
+var points = [
+    //new b2Vec2(200/SCALE,70/SCALE),    
+    new b2Vec2(250/SCALE,140/SCALE),
+    new b2Vec2(250/SCALE,210/SCALE),
+    new b2Vec2(120/SCALE,210/SCALE),
+    new b2Vec2(65/SCALE,100/SCALE),
+];
+fixDef.shape.SetAsArray(points,points.length);
+world.CreateBody(bodyDef).CreateFixture(fixDef);
+
+bodyDef.position.x = (canvas.width/2) / SCALE;
+bodyDef.position.y = (canvas.height-300)/SCALE;
+fixDef.shape = new b2PolygonShape;
+var points = [
+    //new b2Vec2(250/SCALE,0/SCALE),    
+    new b2Vec2(140/SCALE,210/SCALE),
+    new b2Vec2(0/SCALE,210/SCALE),
+    new b2Vec2(0/SCALE,140/SCALE),
+    new b2Vec2(190/SCALE,100/SCALE),
+];
+fixDef.shape.SetAsArray(points,points.length);
+world.CreateBody(bodyDef).CreateFixture(fixDef);
+
+
+//create a circle
+fixDef = new b2FixtureDef;
+fixDef.density = 1.0;
+fixDef.friction = 1.0;
+fixDef.restitution = 0.2;
+bodyDef = new b2BodyDef;
+bodyDef.type = b2Body.b2_dynamicBody;
+bodyDef.allowSleep = false;
+fixDef.shape = new b2CircleShape(2.0);
+bodyDef.position.x = 25;
+bodyDef.position.y = 5;
+circleBody = world.CreateBody(bodyDef);
+circleBody.CreateFixture(fixDef);
+
+
+/*
+for(var i = 0; i < 10; ++i) {
+    if(Math.random() > 0.5) {
+        fixDef.shape = new b2PolygonShape;
+        fixDef.shape.SetAsBox(
+              Math.random() + 0.1 //half width
+           ,  Math.random() + 0.1 //half height
+        );
+    } else {
+        fixDef.shape = new b2CircleShape(
+            Math.random() + 0.1 //radius
+        );
+    }
+    bodyDef.position.x = Math.random() * 25;
+    bodyDef.position.y = Math.random() * 10;
+    world.CreateBody(bodyDef).CreateFixture(fixDef);
+}
+*/
+
+//setup debug draw
+var debugDraw = new b2DebugDraw();
+debugDraw.SetSprite(document.getElementById("c").getContext("2d"));
+debugDraw.SetDrawScale(SCALE);
+debugDraw.SetFillAlpha(0.3);
+debugDraw.SetLineThickness(1.0);
+debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+world.SetDebugDraw(debugDraw);
+}; //init
+    
+    
+
+//set up the loop
+function update() {
+    var val = pitch;
+    if(position == 5) {
+        val = pitch;
+    }
+    if(position == 2) {
+        val = pitch;
+    }
+    var sin = Math.sin(val/180.0*Math.PI);
+    var cos = Math.cos(val/180.0*Math.PI);
+    var x = sin*10.0;
+    var y = cos*10.0;
+    
+    var hyp = Math.sqrt(accelX*accelX+accelY*accelY);
+    var theta = Math.acos(accelY/hyp);
+    if(accelX > 0) theta = 2*Math.PI-theta;
+    theta = theta - Math.PI/2;
+    x = Math.sin(theta)*10.0;
+    y = Math.cos(theta)*10.0;
+    
+    world.SetGravity(new Box2D.Common.Math.b2Vec2(x,y));
+    world.Step(
+         1 / 20   //frame-rate
+      ,  10       //velocity iterations
+      ,  10       //position iterations
+    );
+//    world.DrawDebugData();
+    world.ClearForces();
+     
+
+    //draw world
+//    ctx.drawImage(background,0,0);
+    var cp = circleBody.GetPosition();
+    ctx.clearRect(0,0,1024,748);
+    ctx.save();
+    ctx.translate((cp.x-1.6)*SCALE+50,(cp.y-1.6)*SCALE+50);
+    ctx.rotate(circleBody.GetAngle());
+    ctx.drawImage(icecreamImage1,-70,-67);
+    ctx.restore();
+    ctx.drawImage(bowl,330,550);
+
+    //draw overlay debugging
+
+    /*
+    ctx.fillStyle = "black";
+    ctx.fillText("debug: " + sin + " " + cos, 20, 20);
+    ctx.fillText("position = " + position + " pitch = " + pitch,20,40);
+    ctx.fillText("roll = " + roll, 20,60);
+    ctx.fillText("accel = " + accelX + " " + accelY + " " + accelZ, 20, 80);
+    
+    ctx.fillText("hyp = " + hyp + " theta = " + theta + " " + (toDegrees(theta)), 20,100);
+    ctx.strokeStyle = "red";
+    ctx.beginPath();
+    ctx.moveTo(500,400);
+    ctx.lineTo(500+Math.sin(theta)*100,400+Math.cos(theta)*100);
+    ctx.closePath();
+    ctx.stroke();
+    */
+
+   requestAnimFrame(update);
+}; // update()
+
+function toDegrees(rad) {
+    return rad*180.0/Math.PI;
+}
+init();
+requestAnimFrame(update);
+/*
+document.addEventListener('orientationchange',function(e) {
+        pitch = e.pitch;
+        position = e.position;
+        roll = e.roll;
+//        console.log("orientation: position = " + e.position + " roll = " + e.roll + " pitch = " + e.pitch); 
+}, false);
+*/
+document.addEventListener('acceleration',function(e) {
+        accelX = e.accelX;
+        accelY = e.accelY;
+        accelZ = e.accelZ;
+},false);
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+	"title":"Tilt-O-Scoop",
+	"type":"web",
+	"main":"icecream.html",
+	"id":"com.joshondesign.webos.tiltoscoop",
+	"version":"1.0.0",
+	"vendor":"Josh On Design",
+	"uiRevision":2,
+	"icon": "icon.png"
+}
