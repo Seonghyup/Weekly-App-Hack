@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>PopupDemo Shim Dashboard</title>
+		<script src="../../../Enyo/1.0/framework/enyo.js" type="text/javascript"></script>
+	</head>
+	<body>
+<script type="text/javascript">
+	console.log("script in shimDashboard.html;   enyo.windowParams: ", enyo.windowParams);
+	(function() {
+		var dashboard = new ShimDashboard();
+		dashboard.renderInto(document.body);
+	})();
+</script>
+	</body>
+</html>
