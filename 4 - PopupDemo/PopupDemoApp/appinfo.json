@@ -1,0 +1,20 @@
+{
+	"id": "com.example.popupdemo",
+	"version": "0.0.0",
+	"vendor": "Example Co.",
+	"vendorurl": "http://example.com/popupdemo/support.html",
+	"type": "web",
+	"main": "index.html",
+	"title": "PopupDemo",
+	"icon": "images/icon64.png",
+	"miniicon": "images/icon24.png",
+	"uiRevision": 2,
+	"keywords": ["pop up", "desk accessory"],
+	"exampleSupport": {
+		"copyright": "Copyright © 2011 Example Co.",
+		"email": {
+			"address": "support@example.com",
+			"summary": "Support"
+		}
+	}
+}
