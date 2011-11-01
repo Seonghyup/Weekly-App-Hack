@@ -1,13 +1,13 @@
 <html>
 <head>
-<script src="../../amino2/dist/amino.js"></script>
+<script src="amino.js"></script>
 <style type="text/css">
-canvas { border: 1px solid white; }
-body { background-color: black; }
+canvas { border: 0px solid white; }
+body { background-color: black; padding: 0; margin: 0;}
 </style>
 </head>
 <body onload="startup();">
-<canvas id="canvas" width="600" height="500"></canvas>
+<canvas id="canvas" width="1024" height="768"></canvas>
 
 <script>
 var pressed = false;
@@ -18,25 +18,38 @@ var ctx = canvas.getContext('2d');
 var offscreenBuffer = new Buffer(canvas.width,canvas.height);
 
 var brushSize = 7;
-var bigBrush = new Circle().set(35,114,30).setFill("black");
-var medBrush = new Circle().set(95,148,15).setFill("black");
-var litBrush = new Circle().set(130,200,7).setFill("black");
-var colors = ["brown","green","olive","yellow","black","orange"];
+var bigBrush = new Circle()
+    .set(45,124,30).setFill("black");
+var medBrush = new Circle()
+    .set(155,178,25).setFill("black")
+    .setStroke("white").setStrokeWidth(14);
+var litBrush = new Circle()
+    .set(210,280,17).setFill("red")
+    .setStroke("white").setStrokeWidth(15);
+var colors = ["#ddddaa","yellow","orange","olive","brown","black"];
 var brushColor = colors[0];
+var outerRadius = 350;
+var innerRadius = 280;
 
 var popup;
 var runner;
 var colorPanel;
 var control;
 var offscreen;
+var brushID = -1;
 
 function startup() {
-    canvas.addEventListener('mousemove', handle_mousemove, false);
-    canvas.addEventListener('mousedown', handle_mousedown, false);
-    canvas.addEventListener('mouseup',   handle_mouseup,   false);
+    window.PalmSystem.setWindowOrientation("right");
+    window.PalmSystem.enableFullScreenMode(true);
+
     
+    canvas.ontouchstart = doTouchStart;
+    canvas.ontouchmove = doTouchMove;
+    canvas.ontouchend = doTouchEnd;
+    
+    var rad = 400;
     popup = new Circle()
-        .set(0,250,300)
+        .set(0,350,rad)
         .setFill("white")
         .setStroke("black")
         .setStrokeWidth(5)
@@ -49,33 +62,41 @@ function startup() {
     colorPanel.y = 0;
     colorPanel.draw = function(ctx) {
         if(!this.isVisible()) return;
-        ctx.save();   
+        ctx.save(); 
+        ctx.fillStyle = "black";
+        //ctx.strokeRect(0,0,350,350);
         ctx.globalAlpha = this.getOpacity();
-        ctx.translate(this.x,this.y);
+        //ctx.translate(this.x,this.y);
         for(var i=0; i<6; i++) {
             ctx.fillStyle = colors[i%6];
             var angleDiff = Math.PI/12;
             var angle = Math.PI*3/2+angleDiff*i;
-            var outerRadius = 250;
-            var innerRadius = 180;
             ctx.save();
-            ctx.translate(0,150);
+            ctx.translate(0,outerRadius);
             ctx.beginPath();
-            ctx.arc(0,100,outerRadius, angle, angle+angleDiff, false);
-            ctx.arc(0,100,innerRadius, angle+angleDiff, angle, true);
+            ctx.arc(0,0,outerRadius, angle, angle+angleDiff, false);
+            ctx.arc(0,0,innerRadius, angle+angleDiff, angle, true);
             ctx.closePath();
             ctx.fill();
+            
+            //if this is the selected color
+            if(brushColor == colors[i%6]) {
+                ctx.beginPath();
+                ctx.arc(0,0,outerRadius+35, angle, angle+angleDiff, false);
+                ctx.arc(0,0,outerRadius+15, angle+angleDiff, angle, true);
+                ctx.closePath();
+                ctx.fill();
+            }
             ctx.restore();
         }
         ctx.restore();
     };
     colorPanel.contains = function(x,y) {
-        if(x < this.x || x > this.x + 250) return false;
-        if(y < this.y || y > this.y + 250) return false;
-        var distsq = x*x + (250-y)*(250-y);
-        if(distsq < 180*180) return false;
-        if(distsq > 250*250) return false;
-        console.log("y = " + distsq);
+        if(x < this.x || x > this.x + outerRadius) return false;
+        if(y < this.y || y > this.y + outerRadius) return false;
+        var distsq = x*x + (outerRadius-y)*(outerRadius-y);
+        if(distsq < innerRadius*innerRadius) return false;
+        if(distsq > outerRadius*outerRadius) return false;
         return true;
     };
 
@@ -94,18 +115,12 @@ function startup() {
         .add(litBrush)
         )
         .setTranslateX(0)
-        .setTranslateY(canvas.height-250)
+        .setTranslateY(canvas.height-350)
     ;
+    control.closed = false;
         
     
     runner = new Runner();
-    
-    runner.listen("MOUSE_PRESS",popup,openPopup);
-    runner.listen("MOUSE_RELEASE",popup,closePopup);
-    runner.listen("MOUSE_PRESS",null,setBrush);
-    runner.listen("MOUSE_PRESS",colorPanel,setColor);
-    
-    
     runner.setCanvas(canvas);
     runner.setBackground("white");
     runner.setRoot(new Group()
@@ -114,22 +129,102 @@ function startup() {
         );
     runner.DEBUG = false;
     runner.start();
+    
+    closePopup();
 }
 
-function setBrush(e) {
-    if(e.node == bigBrush) {
+function doTouchStart(e) {
+    //    console.log("touch started:         touch count = " + e.touches.length);
+    //    console.log("touch started: target  touch count = " + e.targetTouches.length);
+    //    console.log("touch started: changed touch count = " + e.changedTouches.length);
+   for(var i=0; i<e.touches.length; i++) {
+        var touch = e.touches[i];
+        //console.log(" touch = " + touch.identifier + " " + touch.clientX + " " + touch.clientY);
+        var x = touch.clientX;
+        var y = touch.clientY;
+        x -= control.getTranslateX();
+        y -= control.getTranslateY();
+        if(popup.contains(x,y) && control.closed) {
+            //send to popup
+            openPopup();
+            control.openid = touch.identifier;
+        } else {
+            //send to canvas
+            brushID = touch.identifier;
+        }
+    }
+}
+function doTouchMove(e) {
+    //console.log("touch moved:         touch count = " + e.touches.length);
+    //console.log("touch moved: target  touch count = " + e.targetTouches.length);
+    //console.log("touch moved: changed touch count = " + e.changedTouches.length);
+    for(var i=0; i<e.changedTouches.length; i++) {
+        var touch = e.changedTouches[i];
+        //if this touch is for the control, skip it
+        if(touch.identifier == control.openid) continue;
+        
+        //process buttons inside control if it's open
+        if(!control.closed) {
+            var x = touch.clientX;
+            var y = touch.clientY;
+            x -= control.getTranslateX();
+            y -= control.getTranslateY();
+            if(bigBrush.contains(x,y)) {
+                setBrush(bigBrush);
+                continue;
+            }
+            if(medBrush.contains(x,y)) {
+                setBrush(medBrush);
+                continue;
+            }
+            if(litBrush.contains(x,y)) {
+                setBrush(litBrush);
+                continue;
+            }
+            if(colorPanel.contains(x,y)) {
+                setColor(x,y);
+                continue;
+            }
+        }
+        
+        //if we got here, then just draw on the canvas
+        drawBrush(touch.clientX,touch.clientY);
+    }
+    
+}
+function doTouchEnd(e) {
+    //console.log("touch ended:         touch count = " + e.touches.length);
+    //console.log("touch ended: target  touch count = " + e.targetTouches.length);
+    //console.log("touch ended: changed touch count = " + e.changedTouches.length);
+    for(var i=0; i<e.changedTouches.length; i++) {
+        var touch = e.changedTouches[i];
+        //console.log(" touch = " + touch.identifier + " " + touch.clientX + " " + touch.clientY);
+        //console.log(" control id = " + control.openid);
+        if(touch.identifier == control.openid) {
+            closePopup();
+            control.openid = -1;
+        }
+        if(touch.identifier == brushID) {
+            brushID = -1;
+        }
+    }
+    
+}
+
+function setBrush(node) {
+    if(node == bigBrush) {
         bigBrush.setFill("red");
         medBrush.setFill("black");
         litBrush.setFill("black");
         brushSize = 30;
     }
-    if(e.node == medBrush) {
+    if(node == medBrush) {
         bigBrush.setFill("black");
         medBrush.setFill("red");
         litBrush.setFill("black");
         brushSize = 15;
     }
-    if(e.node == litBrush) {
+    if(node == litBrush) {
         bigBrush.setFill("black");
         medBrush.setFill("black");
         litBrush.setFill("red");
@@ -137,68 +232,46 @@ function setBrush(e) {
     }
 }
 
-function setColor(e) {
-    var y = 250-(e.y-control.getTranslateY());
-    console.log('setting a color: ' + e.x + " " + y);
-    var angle = Math.atan2(e.x,y);
-    console.log('atan2 = ' + angle);
+function setColor(x,y) {
+    y = outerRadius-y;
+    var angle = Math.atan2(x,y);
     angle = angle * 180/Math.PI;
     var chunk = Math.floor(angle/(90/6));
-    console.log("angle = " + angle + "    " + chunk);
-    brushColor = colors[chunk];
+    brushColor = colors[chunk%colors.length];
+    colorPanel.setDirty();
 }
 
-function handle_mousedown(e) {
-    /*
-    if(e.offsetX <= 50) {
-        if(popupPressed) {
-            runner.addAnim(new PropAnim(popup,"radius",250,100,0.3));
-            runner.addAnim(new PropAnim(colorPanel,"opacity",1,0,0.3));
-            runner.addAnim(new PropAnim(control,"translateX",0,-250,0.3));
-            runner.addAnim(new PropAnim(control,"translateY",canvas.height-250,canvas.height+100,0.3));
-            popupPressed = false;
-        } else {
-            runner.addAnim(new PropAnim(popup,"radius",100,250,0.3));
-            runner.addAnim(new PropAnim(colorPanel,"opacity",0,1,0.3));
-            runner.addAnim(new PropAnim(control,"translateX",-250,0,0.3));
-            runner.addAnim(new PropAnim(control,"translateY",canvas.height+100,canvas.height-250,0.3));
-            popupPressed = true;
-        }
-        return;
-    }
-    */
-    pressed = true;
-}
-
-function openPopup() {
-//    runner.addAnim(new PropAnim(popup,"radius",100,250,0.3));
-    runner.addAnim(new PropAnim(colorPanel,"opacity",0,1,0.3));
-    runner.addAnim(new PropAnim(control,"translateX",-200,0,0.3));
-    runner.addAnim(new PropAnim(control,"translateY",canvas.height+0,canvas.height-250,0.3));
-}
-
-function closePopup() {
-//    runner.addAnim(new PropAnim(popup,"radius",250,100,0.3));
-    runner.addAnim(new PropAnim(colorPanel,"opacity",1,0,0.3));
-    runner.addAnim(new PropAnim(control,"translateX",0,-200,0.3));
-    runner.addAnim(new PropAnim(control,"translateY",canvas.height-250,canvas.height-100,0.3));
-}
-
-function handle_mousemove(e) {
-    if(!pressed) return;
+function drawBrush(x,y) {
     var c = offscreenBuffer.getContext();
     c.fillStyle = brushColor;
     c.beginPath();
-    c.arc(e.offsetX,e.offsetY,brushSize, 0,Math.PI*2,false);
+    c.arc(x,y,brushSize, 0,Math.PI*2,false);
     c.closePath();
     c.fill();
     offscreen.setDirty(true);
 }
-function handle_mouseup(e) {
-    pressed = false;
+
+function openPopup() {
+    control.closed = false;
+    runner.addAnim(new PropAnim(colorPanel,"opacity",0,1,0.3));
+    runner.addAnim(new PropAnim(control,"translateX",
+        -250,
+        0,0.3));
+    runner.addAnim(new PropAnim(control,"translateY",
+        canvas.height-100,
+        canvas.height-350,0.3));
 }
 
-
+function closePopup() {
+    control.closed = true;
+    runner.addAnim(new PropAnim(colorPanel,"opacity",1,0,0.3));
+    runner.addAnim(new PropAnim(control,"translateX",
+        0,
+        -250,0.3));
+    runner.addAnim(new PropAnim(control,"translateY",
+        canvas.height-250,
+        canvas.height-100,0.3));
+}
 
 
 </script>

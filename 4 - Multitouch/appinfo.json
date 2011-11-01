@@ -1,0 +1,10 @@
+{
+	"title":"Multitouch Paint",
+	"type":"web",
+	"main":"index.html",
+	"id":"com.joshondesign.webos.multipaint",
+	"version":"0.0.1",
+	"vendor":"Josh On Design",
+	"uiRevision":2,
+	"icon": "icon.png"
+}
