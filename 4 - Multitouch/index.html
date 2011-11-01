@@ -1,0 +1,206 @@
+<html>
+<head>
+<script src="../../amino2/dist/amino.js"></script>
+<style type="text/css">
+canvas { border: 1px solid white; }
+body { background-color: black; }
+</style>
+</head>
+<body onload="startup();">
+<canvas id="canvas" width="600" height="500"></canvas>
+
+<script>
+var pressed = false;
+var popupPressed = false;
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext('2d');
+
+var offscreenBuffer = new Buffer(canvas.width,canvas.height);
+
+var brushSize = 7;
+var bigBrush = new Circle().set(35,114,30).setFill("black");
+var medBrush = new Circle().set(95,148,15).setFill("black");
+var litBrush = new Circle().set(130,200,7).setFill("black");
+var colors = ["brown","green","olive","yellow","black","orange"];
+var brushColor = colors[0];
+
+var popup;
+var runner;
+var colorPanel;
+var control;
+var offscreen;
+
+function startup() {
+    canvas.addEventListener('mousemove', handle_mousemove, false);
+    canvas.addEventListener('mousedown', handle_mousedown, false);
+    canvas.addEventListener('mouseup',   handle_mouseup,   false);
+    
+    popup = new Circle()
+        .set(0,250,300)
+        .setFill("white")
+        .setStroke("black")
+        .setStrokeWidth(5)
+        ;
+        
+    
+    
+    colorPanel = new Shape();
+    colorPanel.x = 0;
+    colorPanel.y = 0;
+    colorPanel.draw = function(ctx) {
+        if(!this.isVisible()) return;
+        ctx.save();   
+        ctx.globalAlpha = this.getOpacity();
+        ctx.translate(this.x,this.y);
+        for(var i=0; i<6; i++) {
+            ctx.fillStyle = colors[i%6];
+            var angleDiff = Math.PI/12;
+            var angle = Math.PI*3/2+angleDiff*i;
+            var outerRadius = 250;
+            var innerRadius = 180;
+            ctx.save();
+            ctx.translate(0,150);
+            ctx.beginPath();
+            ctx.arc(0,100,outerRadius, angle, angle+angleDiff, false);
+            ctx.arc(0,100,innerRadius, angle+angleDiff, angle, true);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+        ctx.restore();
+    };
+    colorPanel.contains = function(x,y) {
+        if(x < this.x || x > this.x + 250) return false;
+        if(y < this.y || y > this.y + 250) return false;
+        var distsq = x*x + (250-y)*(250-y);
+        if(distsq < 180*180) return false;
+        if(distsq > 250*250) return false;
+        console.log("y = " + distsq);
+        return true;
+    };
+
+    colorPanel.setVisible(true);
+    
+    offscreen = new Node();
+    offscreen.draw = function(ctx) {
+        ctx.drawImage(offscreenBuffer.buffer,0,0);
+    };
+    
+    control = new Transform(new Group()
+        .add(popup)
+        .add(colorPanel)
+        .add(bigBrush)
+        .add(medBrush)
+        .add(litBrush)
+        )
+        .setTranslateX(0)
+        .setTranslateY(canvas.height-250)
+    ;
+        
+    
+    runner = new Runner();
+    
+    runner.listen("MOUSE_PRESS",popup,openPopup);
+    runner.listen("MOUSE_RELEASE",popup,closePopup);
+    runner.listen("MOUSE_PRESS",null,setBrush);
+    runner.listen("MOUSE_PRESS",colorPanel,setColor);
+    
+    
+    runner.setCanvas(canvas);
+    runner.setBackground("white");
+    runner.setRoot(new Group()
+        .add(offscreen)
+        .add(control)
+        );
+    runner.DEBUG = false;
+    runner.start();
+}
+
+function setBrush(e) {
+    if(e.node == bigBrush) {
+        bigBrush.setFill("red");
+        medBrush.setFill("black");
+        litBrush.setFill("black");
+        brushSize = 30;
+    }
+    if(e.node == medBrush) {
+        bigBrush.setFill("black");
+        medBrush.setFill("red");
+        litBrush.setFill("black");
+        brushSize = 15;
+    }
+    if(e.node == litBrush) {
+        bigBrush.setFill("black");
+        medBrush.setFill("black");
+        litBrush.setFill("red");
+        brushSize = 7;
+    }
+}
+
+function setColor(e) {
+    var y = 250-(e.y-control.getTranslateY());
+    console.log('setting a color: ' + e.x + " " + y);
+    var angle = Math.atan2(e.x,y);
+    console.log('atan2 = ' + angle);
+    angle = angle * 180/Math.PI;
+    var chunk = Math.floor(angle/(90/6));
+    console.log("angle = " + angle + "    " + chunk);
+    brushColor = colors[chunk];
+}
+
+function handle_mousedown(e) {
+    /*
+    if(e.offsetX <= 50) {
+        if(popupPressed) {
+            runner.addAnim(new PropAnim(popup,"radius",250,100,0.3));
+            runner.addAnim(new PropAnim(colorPanel,"opacity",1,0,0.3));
+            runner.addAnim(new PropAnim(control,"translateX",0,-250,0.3));
+            runner.addAnim(new PropAnim(control,"translateY",canvas.height-250,canvas.height+100,0.3));
+            popupPressed = false;
+        } else {
+            runner.addAnim(new PropAnim(popup,"radius",100,250,0.3));
+            runner.addAnim(new PropAnim(colorPanel,"opacity",0,1,0.3));
+            runner.addAnim(new PropAnim(control,"translateX",-250,0,0.3));
+            runner.addAnim(new PropAnim(control,"translateY",canvas.height+100,canvas.height-250,0.3));
+            popupPressed = true;
+        }
+        return;
+    }
+    */
+    pressed = true;
+}
+
+function openPopup() {
+//    runner.addAnim(new PropAnim(popup,"radius",100,250,0.3));
+    runner.addAnim(new PropAnim(colorPanel,"opacity",0,1,0.3));
+    runner.addAnim(new PropAnim(control,"translateX",-200,0,0.3));
+    runner.addAnim(new PropAnim(control,"translateY",canvas.height+0,canvas.height-250,0.3));
+}
+
+function closePopup() {
+//    runner.addAnim(new PropAnim(popup,"radius",250,100,0.3));
+    runner.addAnim(new PropAnim(colorPanel,"opacity",1,0,0.3));
+    runner.addAnim(new PropAnim(control,"translateX",0,-200,0.3));
+    runner.addAnim(new PropAnim(control,"translateY",canvas.height-250,canvas.height-100,0.3));
+}
+
+function handle_mousemove(e) {
+    if(!pressed) return;
+    var c = offscreenBuffer.getContext();
+    c.fillStyle = brushColor;
+    c.beginPath();
+    c.arc(e.offsetX,e.offsetY,brushSize, 0,Math.PI*2,false);
+    c.closePath();
+    c.fill();
+    offscreen.setDirty(true);
+}
+function handle_mouseup(e) {
+    pressed = false;
+}
+
+
+
+
+</script>
+</body>
+</html>
