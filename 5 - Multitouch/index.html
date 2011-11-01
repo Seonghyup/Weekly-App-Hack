@@ -26,8 +26,13 @@ var medBrush = new Circle()
 var litBrush = new Circle()
     .set(210,280,17).setFill("red")
     .setStroke("white").setStrokeWidth(15);
-var colors = ["#ddddaa","yellow","orange","olive","brown","black"];
+    
+var colors = ["#000000","#634102","#b37503",
+    "#f7a303","#f7bb4a","#f7d186",
+    "#f7e7c8","#ffffff"
+];
 var brushColor = colors[0];
+
 var outerRadius = 350;
 var innerRadius = 280;
 
@@ -39,8 +44,10 @@ var offscreen;
 var brushID = -1;
 
 function startup() {
-    window.PalmSystem.setWindowOrientation("right");
-    window.PalmSystem.enableFullScreenMode(true);
+    if(window.PalmSystem) {
+        window.PalmSystem.setWindowOrientation("right");
+        window.PalmSystem.enableFullScreenMode(true);
+    }
 
     
     canvas.ontouchstart = doTouchStart;
@@ -67,9 +74,9 @@ function startup() {
         //ctx.strokeRect(0,0,350,350);
         ctx.globalAlpha = this.getOpacity();
         //ctx.translate(this.x,this.y);
-        for(var i=0; i<6; i++) {
-            ctx.fillStyle = colors[i%6];
-            var angleDiff = Math.PI/12;
+        for(var i=0; i<colors.length; i++) {
+            ctx.fillStyle = colors[i%colors.length];
+            var angleDiff = Math.PI/2/colors.length;
             var angle = Math.PI*3/2+angleDiff*i;
             ctx.save();
             ctx.translate(0,outerRadius);
@@ -78,9 +85,12 @@ function startup() {
             ctx.arc(0,0,innerRadius, angle+angleDiff, angle, true);
             ctx.closePath();
             ctx.fill();
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 1;
+            ctx.stroke();
             
             //if this is the selected color
-            if(brushColor == colors[i%6]) {
+            if(brushColor == colors[i%colors.length]) {
                 ctx.beginPath();
                 ctx.arc(0,0,outerRadius+35, angle, angle+angleDiff, false);
                 ctx.arc(0,0,outerRadius+15, angle+angleDiff, angle, true);
@@ -134,9 +144,6 @@ function startup() {
 }
 
 function doTouchStart(e) {
-    //    console.log("touch started:         touch count = " + e.touches.length);
-    //    console.log("touch started: target  touch count = " + e.targetTouches.length);
-    //    console.log("touch started: changed touch count = " + e.changedTouches.length);
    for(var i=0; i<e.touches.length; i++) {
         var touch = e.touches[i];
         //console.log(" touch = " + touch.identifier + " " + touch.clientX + " " + touch.clientY);
@@ -151,13 +158,13 @@ function doTouchStart(e) {
         } else {
             //send to canvas
             brushID = touch.identifier;
+            //if we got here, then just draw on the canvas
+            drawBrush(touch.clientX,touch.clientY);
         }
     }
 }
+
 function doTouchMove(e) {
-    //console.log("touch moved:         touch count = " + e.touches.length);
-    //console.log("touch moved: target  touch count = " + e.targetTouches.length);
-    //console.log("touch moved: changed touch count = " + e.changedTouches.length);
     for(var i=0; i<e.changedTouches.length; i++) {
         var touch = e.changedTouches[i];
         //if this touch is for the control, skip it
@@ -192,14 +199,10 @@ function doTouchMove(e) {
     }
     
 }
+
 function doTouchEnd(e) {
-    //console.log("touch ended:         touch count = " + e.touches.length);
-    //console.log("touch ended: target  touch count = " + e.targetTouches.length);
-    //console.log("touch ended: changed touch count = " + e.changedTouches.length);
     for(var i=0; i<e.changedTouches.length; i++) {
         var touch = e.changedTouches[i];
-        //console.log(" touch = " + touch.identifier + " " + touch.clientX + " " + touch.clientY);
-        //console.log(" control id = " + control.openid);
         if(touch.identifier == control.openid) {
             closePopup();
             control.openid = -1;
@@ -236,7 +239,7 @@ function setColor(x,y) {
     y = outerRadius-y;
     var angle = Math.atan2(x,y);
     angle = angle * 180/Math.PI;
-    var chunk = Math.floor(angle/(90/6));
+    var chunk = Math.floor(angle/(90/colors.length));
     brushColor = colors[chunk%colors.length];
     colorPanel.setDirty();
 }
