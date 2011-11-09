@@ -1,0 +1,384 @@
+var c1 = 
+  new Transform(
+    new Ellipse().set(0.0,0.0,156.0,108.0)
+      .setStrokeWidth
+      (0.0)
+      .setStroke
+      ('rgba(0,0,0,1)')
+      .setFill
+      ('rgba(255,42,24,1)')
+      .setOpacity
+      (0.4835164835164835)
+      )
+  .setTranslateX
+  (242.0)
+  .setTranslateY
+  (250.0)
+  .setAnchorX
+  (0.0)
+  .setAnchorY
+  (0.0)
+  .setScaleX
+  (1.0)
+  .setScaleY
+  (1.0)
+  .setRotate
+  (0.0)
+  ;
+var c2 =   new Transform(
+    new Ellipse().set(0.0,0.0,156.0,108.0)
+      .setStrokeWidth
+      (0.0)
+      .setStroke
+      ('rgba(0,0,0,1)')
+      .setFill
+      ('rgba(33,219,255,1)')
+      .setOpacity
+      (0.4835164835164835)
+      )
+  .setTranslateX
+  (235.0)
+  .setTranslateY
+  (250.0)
+  .setAnchorX
+  (0.0)
+  .setAnchorY
+  (0.0)
+  .setScaleX
+  (1.0)
+  .setScaleY
+  (1.0)
+  .setRotate
+  (0.0)
+;
+
+var sceneRoot = new Group()
+.add(
+  new Transform(
+    new Ellipse().set(0.0,0.0,156.0,108.0)
+      .setStrokeWidth
+      (0.0)
+      .setStroke
+      ('rgba(0,0,0,1)')
+      .setFill
+      ('rgba(255,42,24,1)')
+      .setOpacity
+      (0.4835164835164835)
+      )
+  .setTranslateX
+  (217.0)
+  .setTranslateY
+  (94.0)
+  .setAnchorX
+  (0.0)
+  .setAnchorY
+  (0.0)
+  .setScaleX
+  (1.0)
+  .setScaleY
+  (1.0)
+  .setRotate
+  (0.0)
+  )
+.add(
+  new Transform(
+    new Ellipse().set(0.0,0.0,156.0,108.0)
+      .setStrokeWidth
+      (0.0)
+      .setStroke
+      ('rgba(0,0,0,1)')
+      .setFill
+      ('rgba(33,219,255,1)')
+      .setOpacity
+      (0.4835164835164835)
+      )
+  .setTranslateX
+  (207.0)
+  .setTranslateY
+  (94.0)
+  .setAnchorX
+  (0.0)
+  .setAnchorY
+  (0.0)
+  .setScaleX
+  (1.0)
+  .setScaleY
+  (1.0)
+  .setRotate
+  (0.0)
+  )
+.add(
+  new Transform(
+    new Ellipse().set(0.0,0.0,156.0,108.0)
+      .setStrokeWidth
+      (0.0)
+      .setStroke
+      ('rgba(0,0,0,1)')
+      .setFill
+      ('rgba(255,42,24,1)')
+      .setOpacity
+      (0.4835164835164835)
+      )
+  .setTranslateX
+  (427.0)
+  .setTranslateY
+  (179.0)
+  .setAnchorX
+  (0.0)
+  .setAnchorY
+  (0.0)
+  .setScaleX
+  (1.0)
+  .setScaleY
+  (1.0)
+  .setRotate
+  (0.0)
+  )
+.add(
+  new Transform(
+    new Ellipse().set(0.0,0.0,156.0,108.0)
+      .setStrokeWidth
+      (0.0)
+      .setStroke
+      ('rgba(0,0,0,1)')
+      .setFill
+      ('rgba(33,219,255,1)')
+      .setOpacity
+      (0.4835164835164835)
+      )
+  .setTranslateX
+  (424.0)
+  .setTranslateY
+  (179.0)
+  .setAnchorX
+  (0.0)
+  .setAnchorY
+  (0.0)
+  .setScaleX
+  (1.0)
+  .setScaleY
+  (1.0)
+  .setRotate
+  (0.0)
+  )
+.add(
+  new Transform(
+    new Rect().set(0.0,0.0,337.0,169.0)
+      .setStrokeWidth
+      (0.0)
+      .setStroke
+      ('rgba(0,0,0,1)')
+      .setFill
+      ('rgba(255,42,24,1)')
+      .setOpacity
+      (0.5054945054945055)
+      )
+  .setTranslateX
+  (393.0)
+  .setTranslateY
+  (393.0)
+  .setAnchorX
+  (0.0)
+  .setAnchorY
+  (0.0)
+  .setScaleX
+  (1.0)
+  .setScaleY
+  (1.0)
+  .setRotate
+  (0.0)
+  )
+.add(
+  new Transform(
+    new Text()
+    .setText
+    ('Flying')
+    .setX
+    (0.0)
+    .setY
+    (95.0)
+    .setHAlign
+    ('left')
+    .setAutoSize
+    (true)
+    .setWidth
+    (235.0)
+    .setFont
+    ('66.83pt OpenSans')
+      .setStrokeWidth
+      (1.0)
+      .setStroke
+      ('rgba(0,0,0,1)')
+      .setFill
+      ('rgba(33,219,255,1)')
+      .setOpacity
+      (0.47252747252747246)
+      )
+  .setTranslateX
+  (130.0)
+  .setTranslateY
+  (330.0)
+  .setAnchorX
+  (0.0)
+  .setAnchorY
+  (0.0)
+  .setScaleX
+  (1.0)
+  .setScaleY
+  (1.0)
+  .setRotate
+  (0.0)
+  )
+.add(
+  new Transform(
+    new Text()
+    .setText
+    ('Flying')
+    .setX
+    (0.0)
+    .setY
+    (95.0)
+    .setHAlign
+    ('left')
+    .setAutoSize
+    (true)
+    .setWidth
+    (235.0)
+    .setFont
+    ('66.83pt OpenSans')
+      .setStrokeWidth
+      (1.0)
+      .setStroke
+      ('rgba(0,0,0,1)')
+      .setFill
+      ('rgba(255,42,24,1)')
+      .setOpacity
+      (0.47252747252747246)
+      )
+  .setTranslateX
+  (125.0)
+  .setTranslateY
+  (329.0)
+  .setAnchorX
+  (0.0)
+  .setAnchorY
+  (0.0)
+  .setScaleX
+  (1.0)
+  .setScaleY
+  (1.0)
+  .setRotate
+  (0.0)
+  )
+.add(
+  new Transform(
+    new Rect().set(0.0,0.0,337.0,169.0)
+      .setStrokeWidth
+      (0.0)
+      .setStroke
+      ('rgba(0,0,0,1)')
+      .setFill
+      ('rgba(33,219,255,1)')
+      .setOpacity
+      (0.5054945054945055)
+      )
+  .setTranslateX
+  (381.0)
+  .setTranslateY
+  (393.0)
+  .setAnchorX
+  (0.0)
+  .setAnchorY
+  (0.0)
+  .setScaleX
+  (1.0)
+  .setScaleY
+  (1.0)
+  .setRotate
+  (0.0)
+  )
+.add(
+  new Transform(
+    new Text()
+    .setText
+    ('Flying')
+    .setX
+    (0.0)
+    .setY
+    (95.0)
+    .setHAlign
+    ('left')
+    .setAutoSize
+    (true)
+    .setWidth
+    (235.0)
+    .setFont
+    ('66.83pt OpenSans')
+      .setStrokeWidth
+      (1.0)
+      .setStroke
+      ('rgba(0,0,0,1)')
+      .setFill
+      ('rgba(33,219,255,1)')
+      .setOpacity
+      (0.47252747252747246)
+      )
+  .setTranslateX
+  (123.0)
+  .setTranslateY
+  (441.0)
+  .setAnchorX
+  (0.0)
+  .setAnchorY
+  (0.0)
+  .setScaleX
+  (1.0)
+  .setScaleY
+  (1.0)
+  .setRotate
+  (0.0)
+  )
+.add(
+  new Transform(
+    new Text()
+    .setText
+    ('Flying')
+    .setX
+    (0.0)
+    .setY
+    (95.0)
+    .setHAlign
+    ('left')
+    .setAutoSize
+    (true)
+    .setWidth
+    (235.0)
+    .setFont
+    ('66.83pt OpenSans')
+      .setStrokeWidth
+      (1.0)
+      .setStroke
+      ('rgba(0,0,0,1)')
+      .setFill
+      ('rgba(255,42,24,1)')
+      .setOpacity
+      (0.47252747252747246)
+      )
+  .setTranslateX
+  (127.0)
+  .setTranslateY
+  (440.0)
+  .setAnchorX
+  (0.0)
+  .setAnchorY
+  (0.0)
+  .setScaleX
+  (1.0)
+  .setScaleY
+  (1.0)
+  .setRotate
+  (0.0)
+  )
+.add(c1)
+.add(c2)
+

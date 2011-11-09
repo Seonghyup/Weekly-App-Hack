@@ -1,0 +1,10 @@
+{
+	"title":"Three Dee Spree",
+	"type":"web",
+	"main":"index.html",
+	"id":"com.joshondesign.webos.threedeespree",
+	"version":"1.0.0",
+	"vendor":"Josh On Design",
+	"uiRevision":2,
+	"icon": "icon.png"
+}

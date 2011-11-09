@@ -1,0 +1,116 @@
+<html><head><title>Amino Canvas Export</title>
+<script src='amino.js'></script>
+<script src='generated.js'></script>
+<style type='text/css'>
+  body {
+
+     background-color: rgba(255,255,255,1)
+  }
+</style>
+</head>
+<body onload="setupDrawing();">
+<canvas width="1024" height="700" id="foo"></canvas>
+<script>
+function setupDrawing(){
+var runner =  new Runner();
+runner.setCanvas(document.getElementById('foo'));
+runner.setFPS(30);
+runner.setBackground('white');
+
+
+var cx = 1024/2;
+var cy = 700/2;
+var MAX = 40;
+var group = new Group();
+var g = new Group();
+group.add(g);
+var count = 0;
+runner.setRoot(group);
+runner.addCallback(function() {
+        count++;
+        if(g.children.length < MAX && count%6==0) {
+            var p = new Group();
+            var pc1 = new Circle()
+                .set(-2,0,2)
+                .setFill('rgba(255,42,24,1)')
+                .setOpacity(0.5)
+                ;
+            p.add(pc1);
+            p.pc1 = pc1;
+            var pc2 = new Circle()
+                .set(0,0,2)
+                .setFill('rgba(33,219,255,1)')
+                .setOpacity(0.5);
+            p.add(pc2);
+            p.pc2 = pc2;
+            
+            p.da = Math.random()*Math.PI*2;
+            p.dx = Math.sin(p.da);
+            p.dy = Math.cos(p.da);
+            p.setX(cx);
+            p.setY(cy);
+            p.t = 0;
+            g.add(p);
+        }
+        for(var i=0; i<g.children.length; i++) {
+            var p = g.children[i];
+            p.t++;
+            p.setX(p.getX()+p.dx*p.t/30);
+            p.setY(p.getY()+p.dy*p.t/30);
+            p.pc1.setX(p.pc1.getX()-p.t/1000);
+            p.pc1.setRadius(0.7*p.t/3);
+            p.pc2.setRadius(0.7*p.t/3);
+            if(p.getX() < 0) reset(p);
+            if(p.getX() > cx*2) reset(p);
+        }
+        
+});
+
+function reset(p) {
+    p.setX(cx);
+    p.setY(cy);
+    p.pc1.setRadius(0.5);
+    p.pc1.setX(2);
+    p.pc2.setRadius(0.5);
+    p.t = 0;
+}
+
+
+group.add(
+    new Group()
+        .setX(250)
+        .setY(200)
+        .add(
+            new Text()
+            .setText("Three Dee Spree")
+            .setFont('50pt bold')
+            .setFill('rgba(255,42,24,1)')
+            .setOpacity(0.5)
+            )
+        .add(
+            new Text()
+            .setText("Three Dee Spree")
+            .setFont('50pt bold')
+            .setFill('rgba(33,219,255,1)')
+            .setOpacity(0.5)
+            .setX(5)
+        )
+    )
+;
+
+
+
+/*runner.addAnim(new PropAnim(c1,"translateX",0+10,820,5).setLoop(true));
+runner.addAnim(new PropAnim(c2,"translateX",0,800,5).setLoop(true));
+runner.addAnim(new PropAnim(c1,"scaleX",1,1.5,5).setLoop(true));
+runner.addAnim(new PropAnim(c1,"scaleY",1,1.5,5).setLoop(true));
+runner.addAnim(new PropAnim(c2,"scaleX",1,1.5,5).setLoop(true));
+runner.addAnim(new PropAnim(c2,"scaleY",1,1.5,5).setLoop(true));
+*/
+runner.DEBUG = false;
+
+runner.start();
+}
+</script>
+</body>
+</html>
