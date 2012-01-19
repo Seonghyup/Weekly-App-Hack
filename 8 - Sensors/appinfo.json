@@ -1,0 +1,10 @@
+{
+	"id": "com.palmdts.enyo.sensors",
+	"version": "1.0.0",
+	"vendor": "HP",
+	"type": "web",
+	"main": "index.html",
+	"title": "Sensors",
+	"icon": "icon.png",
+	"uiRevision": 2
+}
